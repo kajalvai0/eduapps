@@ -514,5 +514,20 @@
             });
         }
     </script>
+    <script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (email === "admin@rstsbd.com" && password === "admin123") {
+        document.getElementById("loginModal").classList.add("hidden");
+        document.getElementById("mainLayout").classList.remove("hidden");
+    } else {
+        document.getElementById("loginError").classList.remove("hidden");
+    }
+});
+    </script>
+    
 </body>
 </html>
