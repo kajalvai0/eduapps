@@ -69,7 +69,7 @@
                 <form id="loginForm">
                     <div class="mb-4">
                         <label for="email" class="block text-white text-sm font-medium mb-2">ইউজার আইডি</label>
-                        <input type="email" id="email" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white" placeholder="আপনার ইমেইল লিখুন" required>
+                        <input type="text" id="email" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white" placeholder="ব্যবহারকারী নাম" required>
                     </div>
                     <div class="mb-6">
                         <label for="password" class="block text-white text-sm font-medium mb-2">পাসওয়ার্ড</label>
@@ -198,8 +198,8 @@
                     <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">মোট ব্যবহারকারী</p>
-                                <h3 class="text-2xl font-bold mt-1">১,২৪৫</h3>
+                                <p class="text-gray-500 text-sm">মোট শিক্ষার্থী</p>
+                                <h3 class="text-2xl font-bold mt-1" data-total-users>০</h3>
                             </div>
                             <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                                 <i class="fas fa-users text-blue-500 text-xl"></i>
@@ -213,11 +213,11 @@
                     <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">মোট অর্ডার</p>
-                                <h3 class="text-2xl font-bold mt-1">৩,৬৭৮</h3>
+                                <p class="text-gray-500 text-sm">মোট শিক্ষক</p>
+                                <h3 class="text-2xl font-bold mt-1" data-total-teachers>০</h3>
                             </div>
                             <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                                <i class="fas fa-shopping-cart text-green-500 text-xl"></i>
+                                <i class="fas fa-user-tie text-green-500 text-xl"></i>
                             </div>
                         </div>
                         <div class="mt-4">
@@ -427,106 +427,99 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Show login modal by default
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loginModal').classList.remove('hidden');
-            
-            // Login form submission
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                
-                // Check credentials
-                if (email === 'rstsbd@gmail.com' && password === '404166k') {
-                    // Hide login modal
-                    document.getElementById('loginModal').classList.add('hidden');
-                    // Show main layout
-                    document.getElementById('mainLayout').classList.remove('hidden');
-                    // Initialize chart
-                    initChart();
-                } else {
-                    // Show error message
-                    document.getElementById('loginError').classList.remove('hidden');
-                }
-            });
-            
-            // Logout functionality
-            document.getElementById('logoutBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                // Hide main layout
-                document.getElementById('mainLayout').classList.add('hidden');
-                // Show login modal
-                document.getElementById('loginModal').classList.remove('hidden');
-                // Reset form
-                document.getElementById('loginForm').reset();
-                // Hide error if visible
-                document.getElementById('loginError').classList.add('hidden');
-            });
-            
-            // Sidebar toggle for mobile
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                document.getElementById('sidebar').classList.remove('-translate-x-full');
-            });
-            
-            document.getElementById('sidebarClose').addEventListener('click', function() {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-            });
-        });
-        
-        // Initialize chart
-        function initChart() {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            const salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই'],
-                    datasets: [{
-                        label: 'বিক্রয়',
-                        data: [65000, 59000, 80000, 81000, 56000, 55000, 40000],
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '৳' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    </script>
-    <script>
-document.getElementById("loginForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+const API_BASE = "http://localhost:8000";
+const TOKEN_KEY = "sia_token";
 
-    if (email === "admin@rstsbd.com" && password === "admin123") {
-        document.getElementById("loginModal").classList.add("hidden");
-        document.getElementById("mainLayout").classList.remove("hidden");
-    } else {
-        document.getElementById("loginError").classList.remove("hidden");
-    }
+function apiFetch(path, opts = {}) {
+    opts.headers = opts.headers || {};
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) opts.headers["Authorization"] = `Bearer ${token}`;
+    return fetch(API_BASE + path, opts).then(async (res) => {
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const loginModal = document.getElementById("loginModal");
+    const mainLayout = document.getElementById("mainLayout");
+    loginModal.classList.remove("hidden");
+
+    // Login
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        try {
+            const resp = await fetch(`${API_BASE}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+            }).then((r) => r.json());
+            if (resp.access_token) {
+                localStorage.setItem(TOKEN_KEY, resp.access_token);
+                loginModal.classList.add("hidden");
+                mainLayout.classList.remove("hidden");
+                loadDashboard();
+            } else {
+                document.getElementById("loginError").classList.remove("hidden");
+            }
+        } catch (err) {
+            document.getElementById("loginError").classList.remove("hidden");
+        }
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem(TOKEN_KEY);
+        mainLayout.classList.add("hidden");
+        loginModal.classList.remove("hidden");
+        document.getElementById("loginForm").reset();
+    });
+
+    // Sidebar toggles
+    document.getElementById("sidebarToggle").addEventListener("click", () => {
+        document.getElementById("sidebar").classList.remove("-translate-x-full");
+    });
+    document.getElementById("sidebarClose").addEventListener("click", () => {
+        document.getElementById("sidebar").classList.add("-translate-x-full");
+    });
 });
+
+async function loadDashboard() {
+    try {
+        const [students, teachers] = await Promise.all([
+            apiFetch("/students"),
+            apiFetch("/teachers"),
+        ]);
+        document.querySelector("[data-total-users]").textContent = students.length;
+        document.querySelector("[data-total-teachers]").textContent = teachers.length;
+        initChart();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function initChart() {
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই'],
+            datasets: [{
+                label: 'ভর্তি',
+                data: [12, 19, 3, 5, 2, 3, 9],
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}}
+    });
+}
     </script>
     
 </body>

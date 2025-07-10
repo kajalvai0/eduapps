@@ -2,3 +2,5 @@ fastapi
 uvicorn
 sqlmodel
 python-multipart
+python-jose[cryptography]
+passlib[bcrypt]

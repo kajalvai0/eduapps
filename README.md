@@ -27,4 +27,23 @@ The API docs will be available at `http://localhost:8000/docs`.
 
 SQLite database file `database.db` is created automatically.
 
+### Authentication
+A default admin user is created automatically:
+
+```
+username: admin
+password: admin123
+```
+
+Obtain token:
+```
+POST /auth/login (form-urlencoded)
+  - username
+  - password
+```
+Use the returned `access_token` as HTTP header:
+```
+Authorization: Bearer <token>
+```
+
 ---
