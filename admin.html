@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এডমিন প্যানেল | Shibganj Islamic Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-container {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+        
+        .wave svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 150px;
+        }
+        
+        .wave .shape-fill {
+            fill: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+        <div class="login-container rounded-lg shadow-2xl overflow-hidden w-full max-w-md relative">
+            <div class="wave">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+                </svg>
+            </div>
+            <div class="p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white">এডমিন লগইন</h2>
+                    <p class="text-white opacity-80 mt-2">দয়া করে আপনার ক্রেডেনশিয়ালস লিখুন</p>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="email" class="block text-white text-sm font-medium mb-2">ইউজার আইডি</label>
+                        <input type="email" id="email" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white" placeholder="আপনার ইমেইল লিখুন" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-white text-sm font-medium mb-2">পাসওয়ার্ড</label>
+                        <input type="password" id="password" class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white" placeholder="আপনার পাসওয়ার্ড লিখুন" required>
+                    </div>
+                    <button type="submit" class="w-full bg-white text-indigo-700 font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition duration-300">লগইন করুন</button>
+                </form>
+                <div id="loginError" class="mt-4 text-red-300 text-sm hidden">
+                    <i class="fas fa-exclamation-circle mr-2"></i> ভুল ইউজার আইডি বা পাসওয়ার্ড
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout (Hidden until login) -->
+    <div id="mainLayout" class="hidden">
+        <!-- Sidebar -->
+        <div class="sidebar fixed inset-y-0 left-0 bg-indigo-800 text-white w-64 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40" id="sidebar">
+            <div class="flex items-center justify-between p-4 border-b border-indigo-700">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">Shibganj Islamic Academy</span>
+                </div>
+                <button id="sidebarClose" class="md:hidden text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <i class="fas fa-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">এডমিন</h3>
+                        <p class="text-xs text-indigo-200">সুপার অ্যাডমিন</p>
+                    </div>
+                </div>
+                <nav>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg bg-indigo-700">
+                                <i class="fas fa-tachometer-alt w-5 text-center"></i>
+                                <span>ড্যাশবোর্ড</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                                <i class="fas fa-users w-5 text-center"></i>
+                                <span>ব্যবহারকারীরা</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                                <i class="fas fa-box w-5 text-center"></i>
+                                <span>পণ্য</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                                <i class="fas fa-shopping-cart w-5 text-center"></i>
+                                <span>অর্ডার</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                                <i class="fas fa-chart-line w-5 text-center"></i>
+                                <span>রিপোর্ট</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                                <i class="fas fa-cog w-5 text-center"></i>
+                                <span>সেটিংস</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700">
+                <a href="#" id="logoutBtn" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                    <span>লগআউট</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="md:ml-64 transition-all duration-300">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-4 py-3">
+                    <div class="flex items-center space-x-4">
+                        <button id="sidebarToggle" class="md:hidden text-gray-600">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-bold text-gray-800">ড্যাশবোর্ড</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-bell text-xl"></i>
+                            </button>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-envelope text-xl"></i>
+                            </button>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <i class="fas fa-user text-indigo-600"></i>
+                            </div>
+                            <span class="font-medium hidden md:inline">এডমিন</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-4 md:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">মোট ব্যবহারকারী</p>
+                                <h3 class="text-2xl font-bold mt-1">১,২৪৫</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-users text-blue-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-green-500 text-sm font-medium"><i class="fas fa-arrow-up mr-1"></i> ১২.৫%</span>
+                            <span class="text-gray-500 text-sm ml-2">গত মাস থেকে</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">মোট অর্ডার</p>
+                                <h3 class="text-2xl font-bold mt-1">৩,৬৭৮</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                                <i class="fas fa-shopping-cart text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-green-500 text-sm font-medium"><i class="fas fa-arrow-up mr-1"></i> ২৩.১%</span>
+                            <span class="text-gray-500 text-sm ml-2">গত মাস থেকে</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">মোট আয়</p>
+                                <h3 class="text-2xl font-bold mt-1">৳১,২৪,৫৬৭</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-wallet text-purple-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-green-500 text-sm font-medium"><i class="fas fa-arrow-up mr-1"></i> ৮.৭%</span>
+                            <span class="text-gray-500 text-sm ml-2">গত মাস থেকে</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card bg-white rounded-lg shadow-md p-6 transition duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">পেন্ডিং অর্ডার</p>
+                                <h3 class="text-2xl font-bold mt-1">১২৪</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                                <i class="fas fa-clock text-yellow-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-red-500 text-sm font-medium"><i class="fas fa-arrow-down mr-1"></i> ৩.২%</span>
+                            <span class="text-gray-500 text-sm ml-2">গত মাস থেকে</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold">বিক্রয় সারাংশ</h3>
+                            <select class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option>এই মাস</option>
+                                <option>গত মাস</option>
+                                <option>এই বছর</option>
+                            </select>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-bold mb-6">সাম্প্রতিক কার্যক্রম</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-user-plus text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">নতুন ব্যবহারকারী নিবন্ধিত</p>
+                                    <p class="text-xs text-gray-500">আব্দুল্লাহ আল মামুন</p>
+                                    <p class="text-xs text-gray-400 mt-1">১০ মিনিট আগে</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-shopping-cart text-green-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">নতুন অর্ডার প্লেসড</p>
+                                    <p class="text-xs text-gray-500">অর্ডার #ORD-4567</p>
+                                    <p class="text-xs text-gray-400 mt-1">৩০ মিনিট আগে</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-money-bill-wave text-purple-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">পেমেন্ট রিসিভড</p>
+                                    <p class="text-xs text-gray-500">৳১২,৫০০</p>
+                                    <p class="text-xs text-gray-400 mt-1">১ ঘণ্টা আগে</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">স্টক সতর্কতা</p>
+                                    <p class="text-xs text-gray-500">পণ্য #PRD-789 কমে গেছে</p>
+                                    <p class="text-xs text-gray-400 mt-1">২ ঘণ্টা আগে</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold">সাম্প্রতিক অর্ডার</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">অর্ডার আইডি</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">গ্রাহক</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">স্ট্যাটাস</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">মোট</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">তারিখ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-4567</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">আব্দুল্লাহ আল মামুন</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">সম্পূর্ণ</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৳১২,৫০০</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">১২ জুন, ২০২৩</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">দেখুন</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-4566</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">সুমাইয়া আক্তার</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">প্রক্রিয়াধীন</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৳৮,৯০০</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">১১ জুন, ২০২৩</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">দেখুন</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-4565</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">রফিকুল ইসলাম</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">শিপড</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৳১৫,২০০</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">১০ জুন, ২০২৩</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">দেখুন</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-4564</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">নুসরাত জাহান</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">বাতিল</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৳৬,৭৫০</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৯ জুন, ২০২৩</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">দেখুন</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#ORD-4563</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">কামরুল হাসান</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">সম্পূর্ণ</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৳১০,৩০০</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">৮ জুন, ২০২৩</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">দেখুন</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            দেখানো হচ্ছে <span class="font-medium">১</span> থেকে <span class="font-medium">৫</span> পর্যন্ত, মোট <span class="font-medium">১২৪</span> এন্ট্রি
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                পূর্ববর্তী
+                            </button>
+                            <button class="px-3 py-1 border border-indigo-500 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                                ১
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                ২
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                ৩
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                পরবর্তী
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Show login modal by default
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Check credentials
+                if (email === 'rstsbd@gmail.com' && password === '404166k') {
+                    // Hide login modal
+                    document.getElementById('loginModal').classList.add('hidden');
+                    // Show main layout
+                    document.getElementById('mainLayout').classList.remove('hidden');
+                    // Initialize chart
+                    initChart();
+                } else {
+                    // Show error message
+                    document.getElementById('loginError').classList.remove('hidden');
+                }
+            });
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Hide main layout
+                document.getElementById('mainLayout').classList.add('hidden');
+                // Show login modal
+                document.getElementById('loginModal').classList.remove('hidden');
+                // Reset form
+                document.getElementById('loginForm').reset();
+                // Hide error if visible
+                document.getElementById('loginError').classList.add('hidden');
+            });
+            
+            // Sidebar toggle for mobile
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('-translate-x-full');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            });
+        });
+        
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই'],
+                    datasets: [{
+                        label: 'বিক্রয়',
+                        data: [65000, 59000, 80000, 81000, 56000, 55000, 40000],
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '৳' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (email === "admin@rstsbd.com" && password === "admin123") {
+        document.getElementById("loginModal").classList.add("hidden");
+        document.getElementById("mainLayout").classList.remove("hidden");
+    } else {
+        document.getElementById("loginError").classList.remove("hidden");
+    }
+});
+    </script>
+    
+</body>
+</html>
